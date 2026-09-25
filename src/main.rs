@@ -2,9 +2,8 @@ use std::error::Error;
 
 use clap::{Parser, Subcommand};
 use stock_agent::config::AppConfig;
-use stock_agent::database::Database;
 use stock_agent::logging::init_logging;
-use stock_agent::market_data::{MarketDataProvider, MockMarketDataProvider};
+use stock_agent::market_data::{FinnhubMarketDataProvider, MarketDataProvider, MockMarketDataProvider};
 use stock_agent::trading::TradingEngine;
 use stock_agent::portfolio::Portfolio;
 
@@ -33,7 +32,7 @@ enum Command {
 async fn main() -> Result<(), Box<dyn Error>> {
     init_logging();
     let config = AppConfig::from_env()?;
-    let _db = Database::connect(&config.database_url).await?;
+    let provider = build_market_data_provider(&config)?;
 
     let cli = Cli::parse();
     match cli.command {
@@ -42,13 +41,11 @@ async fn main() -> Result<(), Box<dyn Error>> {
             println!("PAPER TRADING MODE");
         }
         Command::Quote { symbol } => {
-            let provider = MockMarketDataProvider::new();
             let quote = provider.get_quote(&symbol).await?;
             println!("SYMBOL: {}\nPRICE: ${:.2}\nTIMESTAMP: {}", quote.symbol, quote.price, quote.timestamp);
         }
         Command::Backtest { symbol } => {
             println!("BACKTEST: {symbol}");
-            let provider = MockMarketDataProvider::new();
             let end = chrono::Utc::now();
             let start = end - chrono::Duration::days(30);
             let candles = provider.get_historical_data(&symbol, start, end).await?;
@@ -60,7 +57,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
         }
         Command::PaperTrade { symbol } => {
             println!("PAPER TRADING MODE");
-            let provider = MockMarketDataProvider::new();
             let mut engine = TradingEngine::new(provider, Portfolio::new(100_000.0), true);
             let _ = engine.evaluate_symbol(&symbol).await?;
             println!("Paper trade evaluation complete for {symbol}.");
@@ -80,4 +76,17 @@ async fn main() -> Result<(), Box<dyn Error>> {
     }
 
     Ok(())
+}
+
+fn build_market_data_provider(
+    config: &AppConfig,
+) -> Result<Box<dyn MarketDataProvider>, Box<dyn Error>> {
+    match config.market_data_provider.to_lowercase().as_str() {
+        "mock" => Ok(Box::new(MockMarketDataProvider::new())),
+        "finnhub" => Ok(Box::new(FinnhubMarketDataProvider::new(
+            &config.market_data_base_url,
+            config.market_data_api_key.as_deref().unwrap_or_default(),
+        )?)),
+        provider => Err(format!("Unsupported MARKET_DATA_PROVIDER '{provider}'. Use 'mock' or 'finnhub'.").into()),
+    }
 }

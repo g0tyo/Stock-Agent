@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101413">
+  <title>Stock Agent / Command Center</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div>
+          <p class="eyebrow">AUTONOMOUS RESEARCH</p>
+          <h1>stock<span>agent</span></h1>
+        </div>
+      </div>
+
+      <div class="mode-badge"><span class="pulse-dot"></span><div><strong>PAPER MODE</strong><small>Execution is simulated</small></div></div>
+
+      <nav class="primary-nav" aria-label="Primary navigation">
+        <button class="nav-item active" data-view="overview"><span class="nav-icon">◈</span>Overview</button>
+        <button class="nav-item" data-view="positions"><span class="nav-icon">▥</span>Positions</button>
+        <button class="nav-item" data-view="decisions"><span class="nav-icon">↗</span>Decisions</button>
+        <button class="nav-item" data-view="risk"><span class="nav-icon">△</span>Risk controls</button>
+      </nav>
+
+      <div class="watchlist">
+        <div class="section-heading"><span>Watchlist</span><button class="icon-button" title="Add symbol" aria-label="Add symbol">+</button></div>
+        <button class="watch-row selected" data-symbol="AAPL"><span class="ticker-dot lime"></span><span><strong>AAPL</strong><small>Apple Inc.</small></span><b>$341.00</b></button>
+        <button class="watch-row" data-symbol="MSFT"><span class="ticker-dot blue"></span><span><strong>MSFT</strong><small>Microsoft Corp.</small></span><b>$506.33</b></button>
+        <button class="watch-row" data-symbol="NVDA"><span class="ticker-dot orange"></span><span><strong>NVDA</strong><small>NVIDIA Corp.</small></span><b>$178.21</b></button>
+        <button class="watch-row" data-symbol="GOOGL"><span class="ticker-dot red"></span><span><strong>GOOGL</strong><small>Alphabet Inc.</small></span><b>$251.18</b></button>
+      </div>
+
+      <div class="sidebar-footer"><span class="status-ring"></span><div><small>DATA PROVIDER</small><strong>Finnhub / connected</strong></div></div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div><p class="eyebrow">FRIDAY, SEP 25, 2026 / MARKET OPEN</p><h2>Good morning, operator.</h2></div>
+        <div class="top-actions"><button class="quiet-button" id="refreshButton"><span>↻</span> Refresh data</button><button class="avatar-button" title="Account">SA</button></div>
+      </header>
+
+      <section class="dashboard-view active-view" data-panel="overview">
+        <div class="hero-grid">
+          <section class="quote-panel panel-accent">
+            <div class="panel-topline"><span class="live-label"><span class="live-dot"></span> LIVE QUOTE</span><span id="quoteTimestamp">Updated just now</span></div>
+            <div class="quote-main"><div><p class="quote-symbol" id="selectedSymbol">AAPL <span>NASDAQ</span></p><p class="quote-company" id="selectedCompany">Apple Inc.</p></div><button class="more-button">•••</button></div>
+            <div class="price-line"><strong id="quotePrice">$341.00</strong><span class="positive" id="quoteChange">+$4.82&nbsp; +1.43%</span></div>
+            <div class="chart-wrap"><svg class="price-chart" viewBox="0 0 760 220" role="img" aria-label="AAPL intraday price chart"><defs><linearGradient id="chartFill" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#c7f36b" stop-opacity=".24"/><stop offset="1" stop-color="#c7f36b" stop-opacity="0"/></linearGradient></defs><path class="chart-area" d="M0 170 C35 162 50 150 78 157 S125 133 155 143 S198 110 226 125 S271 116 299 96 S337 117 363 94 S410 102 440 74 S488 85 516 58 S554 68 585 45 S623 70 654 42 S700 53 760 19 V220 H0 Z"/><path class="chart-line" d="M0 170 C35 162 50 150 78 157 S125 133 155 143 S198 110 226 125 S271 116 299 96 S337 117 363 94 S410 102 440 74 S488 85 516 58 S554 68 585 45 S623 70 654 42 S700 53 760 19"/><circle class="chart-point" cx="760" cy="19" r="5"/></svg><div class="chart-axis"><span>10:00</span><span>12:00</span><span>14:00</span><span>16:00</span></div></div>
+          </section>
+
+          <section class="signal-panel panel-accent-yellow">
+            <div class="panel-topline"><span class="eyebrow">STRATEGY OUTPUT</span><span class="signal-status">HIGH CONVICTION</span></div>
+            <div class="signal-hero"><div class="signal-orb">BUY</div><div><p class="signal-label">Current signal</p><h3 id="signalText">BUY</h3><p>Trend alignment is favorable</p></div></div>
+            <div class="score-block"><div class="score-head"><span>Signal score</span><strong id="scoreValue">+8.4 <small>/ 10</small></strong></div><div class="score-track"><span style="width: 84%"></span><i></i></div><div class="score-scale"><span>BEARISH</span><span>NEUTRAL</span><span>BULLISH</span></div></div>
+            <div class="signal-meta"><div><span>Confidence</span><strong>82%</strong></div><div><span>Risk / reward</span><strong>1 : 2.6</strong></div><div><span>Holding period</span><strong>3–10 days</strong></div></div>
+            <button class="primary-button" id="analyzeButton">Run analysis <span>→</span></button>
+          </section>
+        </div>
+
+        <div class="section-title"><div><p class="eyebrow">TECHNICAL SNAPSHOT</p><h3>What the system sees</h3></div><span class="muted-note">Strategy: Momentum / v1.4</span></div>
+        <section class="metrics-grid">
+          <article class="metric-card"><div class="metric-label"><span>RSI (14)</span><span class="metric-icon lime-bg">↗</span></div><strong>64.8</strong><div class="metric-bar"><span style="width:65%"></span></div><small class="positive">Bullish range</small></article>
+          <article class="metric-card"><div class="metric-label"><span>MACD</span><span class="metric-icon blue-bg">⌁</span></div><strong>+2.14</strong><div class="metric-spark blue-spark"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small class="positive">Positive crossover</small></article>
+          <article class="metric-card"><div class="metric-label"><span>Volume ratio</span><span class="metric-icon orange-bg">▥</span></div><strong>1.42x</strong><div class="volume-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><small class="positive">Above average</small></article>
+          <article class="metric-card"><div class="metric-label"><span>Volatility</span><span class="metric-icon red-bg">∿</span></div><strong>18.6%</strong><div class="metric-bar red-bar"><span style="width:38%"></span></div><small>Moderate risk</small></article>
+        </section>
+
+        <div class="lower-grid">
+          <section class="decision-panel panel-accent"><div class="section-title compact"><div><p class="eyebrow">AUDIT TRAIL</p><h3>Latest decisions</h3></div><button class="text-button" data-view-target="decisions">View all →</button></div><div class="decision-list"><div class="decision-row"><span class="decision-symbol lime">AAPL</span><div><strong>BUY signal generated</strong><small>Trend and momentum aligned</small></div><span class="decision-score positive">+8.4</span><time>2m</time></div><div class="decision-row"><span class="decision-symbol blue">MSFT</span><div><strong>HOLD signal generated</strong><small>Score below entry threshold</small></div><span class="decision-score neutral">+3.1</span><time>8m</time></div><div class="decision-row"><span class="decision-symbol orange">NVDA</span><div><strong>Risk check passed</strong><small>Position sizing recalculated</small></div><span class="decision-score positive">+6.7</span><time>14m</time></div></div></section>
+          <section class="allocation-panel"><div class="section-title compact"><div><p class="eyebrow">PORTFOLIO</p><h3>Allocation</h3></div><span class="positive">+2.84% today</span></div><div class="allocation-body"><div class="donut"><div><strong>68%</strong><small>deployed</small></div></div><div class="allocation-legend"><div><span class="legend-dot lime"></span><span>Equities</span><strong>$68,420</strong></div><div><span class="legend-dot blue"></span><span>Cash</span><strong>$31,580</strong></div><div><span class="legend-dot gray"></span><span>Reserved risk</span><strong>$1,000</strong></div></div></div></section>
+        </div>
+      </section>
+
+      <section class="dashboard-view" data-panel="positions"><div class="section-title"><div><p class="eyebrow">PAPER PORTFOLIO</p><h3>Open positions</h3></div><button class="quiet-button">Export CSV</button></div><div class="table-panel"><table><thead><tr><th>Symbol</th><th>Quantity</th><th>Avg. cost</th><th>Last</th><th>Market value</th><th>Unrealized P/L</th><th>Risk</th></tr></thead><tbody><tr><td><strong>AAPL</strong><small>Apple Inc.</small></td><td>120</td><td>$328.40</td><td>$341.00</td><td>$40,920</td><td class="positive">+$1,512&nbsp; +3.84%</td><td><span class="risk-pill low">Low</span></td></tr><tr><td><strong>MSFT</strong><small>Microsoft Corp.</small></td><td>34</td><td>$498.10</td><td>$506.33</td><td>$17,215</td><td class="positive">+$280&nbsp; +1.65%</td><td><span class="risk-pill medium">Medium</span></td></tr><tr><td><strong>NVDA</strong><small>NVIDIA Corp.</small></td><td>58</td><td>$169.72</td><td>$178.21</td><td>$10,336</td><td class="positive">+$493&nbsp; +5.01%</td><td><span class="risk-pill medium">Medium</span></td></tr></tbody></table></div></section>
+
+      <section class="dashboard-view" data-panel="decisions"><div class="section-title"><div><p class="eyebrow">DECISION LOG</p><h3>Every signal, explained</h3></div><span class="muted-note">Showing the last 24 hours</span></div><div class="table-panel"><table><thead><tr><th>Time</th><th>Symbol</th><th>Signal</th><th>Score</th><th>Confidence</th><th>Reason</th><th>Executed</th></tr></thead><tbody><tr><td>09:42:18</td><td><strong>AAPL</strong></td><td><span class="signal-pill buy">BUY</span></td><td class="positive">+8.4</td><td>82%</td><td>Trend and momentum aligned</td><td><span class="yes-dot">●</span> Yes</td></tr><tr><td>09:36:02</td><td><strong>MSFT</strong></td><td><span class="signal-pill hold">HOLD</span></td><td>+3.1</td><td>54%</td><td>Score below entry threshold</td><td>No</td></tr><tr><td>09:30:45</td><td><strong>NVDA</strong></td><td><span class="signal-pill buy">BUY</span></td><td class="positive">+6.7</td><td>74%</td><td>MACD crossover with strong volume</td><td><span class="yes-dot">●</span> Yes</td></tr></tbody></table></div></section>
+
+      <section class="dashboard-view" data-panel="risk"><div class="section-title"><div><p class="eyebrow">GUARDRAILS</p><h3>Risk controls</h3></div><span class="risk-clear"><span class="live-dot"></span> All systems clear</span></div><div class="risk-grid"><article class="risk-card"><span class="metric-icon lime-bg">✓</span><div><small>Daily loss limit</small><strong>0.42% <em>/ 10.00%</em></strong><div class="risk-progress"><span style="width: 4.2%"></span></div></div></article><article class="risk-card"><span class="metric-icon blue-bg">◌</span><div><small>Portfolio exposure</small><strong>68.42% <em>/ 80.00%</em></strong><div class="risk-progress blue-progress"><span style="width:85%"></span></div></div></article><article class="risk-card"><span class="metric-icon orange-bg">↯</span><div><small>Consecutive losses</small><strong>0 <em>/ 2</em></strong><div class="risk-progress orange-progress"><span style="width: 1%"></span></div></div></article><article class="risk-card"><span class="metric-icon red-bg">⌁</span><div><small>Maximum drawdown</small><strong>3.18% <em>/ 20.00%</em></strong><div class="risk-progress red-progress"><span style="width:16%"></span></div></div></article></div><section class="risk-note"><span class="metric-icon lime-bg">✓</span><div><strong>Circuit breaker armed</strong><p>New trades are automatically blocked if daily loss, drawdown, or repeated-loss limits are reached.</p></div></section></section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status">Analysis refreshed</div>
+  <script src="app.js"></script>
+</body>
+</html>

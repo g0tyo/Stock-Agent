@@ -5,6 +5,8 @@ use std::env;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
     pub database_url: String,
+    pub market_data_provider: String,
+    pub market_data_base_url: String,
     pub market_data_api_key: Option<String>,
     pub broker_api_key: Option<String>,
     pub broker_secret: Option<String>,
@@ -25,6 +27,8 @@ impl Default for AppConfig {
     fn default() -> Self {
         Self {
             database_url: "postgresql://postgres:postgres@localhost:5432/stock_agent".to_string(),
+            market_data_provider: "mock".to_string(),
+            market_data_base_url: "https://finnhub.io/api/v1".to_string(),
             market_data_api_key: None,
             broker_api_key: None,
             broker_secret: None,
@@ -48,6 +52,8 @@ impl AppConfig {
         dotenv().ok();
 
         let database_url = env::var("DATABASE_URL").unwrap_or_else(|_| Self::default().database_url.clone());
+        let market_data_provider = env::var("MARKET_DATA_PROVIDER").unwrap_or_else(|_| Self::default().market_data_provider.clone());
+        let market_data_base_url = env::var("MARKET_DATA_BASE_URL").unwrap_or_else(|_| Self::default().market_data_base_url.clone());
         let market_data_api_key = env::var("MARKET_DATA_API_KEY").ok();
         let broker_api_key = env::var("BROKER_API_KEY").ok();
         let broker_secret = env::var("BROKER_SECRET").ok();
@@ -55,6 +61,8 @@ impl AppConfig {
 
         Ok(Self {
             database_url,
+            market_data_provider,
+            market_data_base_url,
             market_data_api_key,
             broker_api_key,
             broker_secret,
