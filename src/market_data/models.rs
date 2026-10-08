@@ -16,6 +16,8 @@ pub struct Candle {
 pub struct MarketQuote {
     pub symbol: String,
     pub price: f64,
+    pub change: Option<f64>,
+    pub volume: Option<f64>,
     pub timestamp: DateTime<Utc>,
 }
 

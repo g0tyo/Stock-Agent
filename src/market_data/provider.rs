@@ -38,7 +38,9 @@ pub struct FinnhubMarketDataProvider {
 #[derive(Debug, Deserialize)]
 struct FinnhubQuote {
     c: f64,
+    dp: Option<f64>,
     t: i64,
+    v: Option<f64>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -95,7 +97,13 @@ impl MarketDataProvider for FinnhubMarketDataProvider {
         if Utc::now().signed_duration_since(timestamp) > Duration::minutes(15) {
             return Err(MarketDataError::StaleData(format!("Quote for {symbol} is older than 15 minutes.")));
         }
-        Ok(MarketQuote { symbol, price: quote.c, timestamp })
+        Ok(MarketQuote {
+            symbol,
+            price: quote.c,
+            change: quote.dp,
+            volume: quote.v,
+            timestamp,
+        })
     }
 
     async fn get_historical_data(&self, symbol: &str, start: DateTime<Utc>, end: DateTime<Utc>) -> Result<Vec<Candle>, MarketDataError> {
@@ -231,6 +239,8 @@ impl MarketDataProvider for MockMarketDataProvider {
         Ok(MarketQuote {
             symbol,
             price,
+            change: None,
+            volume: None,
             timestamp: Utc::now(),
         })
     }

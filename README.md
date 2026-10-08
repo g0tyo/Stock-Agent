@@ -31,7 +31,18 @@ cd web
 python3 -m http.server 4173
 ```
 
-Then open `http://localhost:4173`. The current dashboard is a frontend prototype using representative paper-trading values; connect it to Rust API endpoints when the persistence/API layer is added.
+Then open `http://localhost:4173`. The dashboard includes a market overview that reads live quotes from the Rust API when the server command is running.
+
+To run the dashboard with server-side Finnhub market data:
+
+```bash
+# Set MARKET_DATA_PROVIDER=finnhub and MARKET_DATA_API_KEY in .env
+cargo run -- server
+cd web && python3 -m http.server 4173
+```
+
+Open `http://localhost:4173/#market`. The browser reads quotes from the Rust API at
+`http://127.0.0.1:8080/api/market`; the Finnhub API key is never sent to the browser.
 
 ## Example commands
 - `cargo run -- analyze AAPL`
