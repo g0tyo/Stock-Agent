@@ -1,0 +1,394 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+3 0 obj
+<< /Length 4784 >>
+stream
+BT
+/F2 16 Tf 54.0 738.0 Td (Honeywell Aerospace Entry Software Engineer Interview Guide) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 12 Tf 54.0 715.0 Td (Project: Stock Agent | Rust + PostgreSQL) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 11 Tf 54.0 694.0 Td (Purpose) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 677.0 Td (This guide explains how to present the Stock Agent project in an interview for Honeywell) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 663.0 Td (Aerospace Software Engineer I. It emphasizes modular design, verification, safe execution,) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 649.0 Td (database integrity, and hardware/software integration principles.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 14 Tf 54.0 624.0 Td (60-Second Project Explanation) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 9 Tf 54.0 601.0 Td (ANSWER) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 587.0 Td (I built a Rust-based stock analysis and paper-trading system focused on making controlled,) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 573.0 Td (risk-aware decisions rather than sending unvalidated trades directly to a broker. The system) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 559.0 Td (collects market data through a provider abstraction, calculates technical indicators such as) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 545.0 Td (moving averages, RSI, MACD, ATR, Bollinger Bands, volatility, and momentum, and passes those) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 531.0 Td (results into a configurable strategy engine.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 514.0 Td (The strategy produces a buy, sell, or hold decision with a confidence score, stop loss, take) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 500.0 Td (profit, and risk-reward ratio. Before an order can be accepted, the risk layer calculates) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 486.0 Td (position size and checks limits such as maximum exposure, maximum drawdown, daily loss, and) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 472.0 Td (consecutive-loss cooldowns. The default execution path is a paper broker, so I can test behavior) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 458.0 Td (without risking real money.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 441.0 Td (I also implemented a backtesting engine, a PostgreSQL-ready persistence layer, a command-line) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 427.0 Td (interface, and a small HTTP dashboard. I wrote automated tests for indicators, strategy) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 413.0 Td (decisions, risk rules, backtesting, and paper-trading behavior. The main engineering lessons) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 399.0 Td (were designing modular interfaces, separating analysis from execution, validating inputs, making) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 385.0 Td (failure conditions explicit, and testing behavior at multiple levels.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 368.0 Td (Those lessons translate well to aerospace test-station software, where reliability,) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 354.0 Td (traceability, controlled interfaces, and verification are more important than simply producing) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 340.0 Td (an output.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 14 Tf 54.0 315.0 Td (Architecture and Data Flow) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 292.0 Td (The system follows this flow:) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 276.0 Td (Market-data provider -> historical candles and current quote -> technical analysis -> strategy) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 262.0 Td (scoring -> risk and position-size validation -> order proposal -> paper broker or future live) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 248.0 Td (broker -> decision and execution record) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 231.0 Td (The main Rust modules have separate responsibilities:) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 215.0 Td (- market_data: provider abstraction, quotes, historical candles, mock data, and optional Finnhub) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 201.0 Td (data.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 184.0 Td (- analysis: technical indicators and market analysis.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 167.0 Td (- strategy: scoring, buy/sell/hold decisions, and risk rules.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 150.0 Td (- portfolio: cash, positions, equity, and trade tracking.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 133.0 Td (- broker: broker interface plus paper and future live implementations.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 116.0 Td (- trading: coordination of data, analysis, strategy, risk, and order proposals.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 99.0 Td (- backtest: historical simulation and performance statistics.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 82.0 Td (- tests: repeatable verification of indicators, risk, strategy, backtesting, and paper) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 68.0 Td (execution.) Tj
+1 0 0 1 -54.0 0 Tm
+ET
+endstream
+endobj
+4 0 obj
+<< /Length 5191 >>
+stream
+BT
+/F2 14 Tf 54.0 735.0 Td (How SQL and Rust Work Together) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 9 Tf 54.0 712.0 Td (ANSWER) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 698.0 Td (The project uses Rust for asynchronous application logic and SQLx for PostgreSQL access. I) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 684.0 Td (created a relational SQL schema with tables for stocks, market data, indicators, signals,) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 670.0 Td (orders, trades, positions, portfolio snapshots, strategy runs, risk events, and system logs.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 653.0 Td (The schema uses primary keys, foreign keys, unique constraints, timestamps, and indexes. For) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 639.0 Td (example, market data is related to a stock by symbol, has a uniqueness rule for symbol and) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 625.0 Td (timestamp, and has an index on symbol and timestamp to support efficient time-series queries.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 608.0 Td (On the Rust side, the Database abstraction creates a PostgreSQL connection pool with SQLx and) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 594.0 Td (PgPoolOptions. The pool is asynchronous and configured with a maximum of ten connections. The) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 580.0 Td (database URL is loaded through AppConfig from environment variables, which avoids hardcoding) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 566.0 Td (deployment-specific settings.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 549.0 Td (The intended flow is that Rust receives market data, calculates indicators, generates a strategy) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 535.0 Td (decision, applies risk checks, and records the related signal, order, trade, portfolio, or risk) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 521.0 Td (event in PostgreSQL. Rust owns business logic and validation, while SQL provides durable) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 507.0 Td (storage, relationships, constraints, and efficient queries.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 490.0 Td (The current version has the PostgreSQL schema and connection foundation in place, while the main) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 476.0 Td (trading path still needs repository methods to persist and load every domain record. I would not) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 462.0 Td (overstate that: the application currently relies primarily on in-memory Rust structures for the) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 448.0 Td (main flow.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 14 Tf 54.0 423.0 Td (Why This Matters for Aerospace) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 9 Tf 54.0 400.0 Td (ANSWER) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 386.0 Td (Although this is not an avionics project, I designed it around principles that transfer to) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 372.0 Td (aerospace software: isolate external interfaces, make safety conditions explicit, support) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 358.0 Td (simulation, log decisions, and verify behavior with repeatable tests.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 341.0 Td (For an automated test station, I could replace the market-data provider with an interface for) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 327.0 Td (hardware or avionics inputs. I would implement simulator and real-device adapters, keep) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 313.0 Td (sequencing and validation independent of hardware, record inputs and outputs for traceability,) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 299.0 Td (and test normal, boundary, timeout, malformed-data, and communication-error conditions.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 282.0 Td (The same database approach could persist test configurations, test runs, measured values,) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 268.0 Td (pass/fail results, software versions, operator information, and fault events. SQL constraints) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 254.0 Td (and timestamps would support data integrity and traceability, while Rust or C++/C# would handle) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 240.0 Td (sequencing, validation, and hardware-interface logic.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 14 Tf 54.0 215.0 Td (Rust and PostgreSQL Talking Points) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 10 Tf 54.0 192.0 Td (How does the database connect to Rust?) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 177.0 Td (The application reads DATABASE_URL through its Rust configuration object. Database::connect) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 163.0 Td (passes that URL to SQLx PgPoolOptions, which creates an asynchronous PostgreSQL connection pool.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 149.0 Td (Repository methods would then execute parameterized SQLx queries and map rows into typed Rust) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 135.0 Td (models.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 10 Tf 54.0 118.0 Td (Why use a connection pool?) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 103.0 Td (A pool avoids opening a new database connection for every operation. It controls resource usage,) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 89.0 Td (supports concurrent asynchronous work, and gives the application a single managed database) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 75.0 Td (access layer.) Tj
+1 0 0 1 -54.0 0 Tm
+ET
+endstream
+endobj
+5 0 obj
+<< /Length 4742 >>
+stream
+BT
+/F2 10 Tf 54.0 738.0 Td (How would you persist an accepted order safely?) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 723.0 Td (I would use a repository layer and a database transaction. The transaction could insert the) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 709.0 Td (order, update the position, record the trade or decision, and write any risk event. If one) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 695.0 Td (operation fails, the transaction rolls back so the database does not show a partially completed) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 681.0 Td (action.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 10 Tf 54.0 664.0 Td (How would you test the database layer?) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 649.0 Td (I would test successful inserts and queries, foreign-key and unique-constraint failures,) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 635.0 Td (malformed data, transaction rollback behavior, and repository error propagation. I would use) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 621.0 Td (deterministic fixtures and an isolated test database so tests do not depend on live market data.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 16 Tf 54.0 596.0 Td (Honeywell Alignment) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 11 Tf 54.0 573.0 Td (Transferable project experience) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 556.0 Td (- Provider abstraction -> hardware or avionics protocol abstraction.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 539.0 Td (- Mock market-data provider -> simulated test equipment or simulated avionics interface.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 522.0 Td (- Paper broker -> safe test mode before connecting to real equipment.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 505.0 Td (- Risk validation -> safety checks and requirement-based validation.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 488.0 Td (- Backtesting -> automated regression and scenario testing.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 471.0 Td (- Decision logs -> traceability and troubleshooting records.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 454.0 Td (- PostgreSQL schema -> durable test history and configuration records.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 437.0 Td (- Rust modules and traits -> maintainable component architecture.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 11 Tf 54.0 420.0 Td (Protocols and tools) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 403.0 Td (I understand that this role uses C++ or C# with Visual Studio and interfaces such as ARINC 429,) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 389.0 Td (MIL-STD-1553, UART, RS-422, and fiber-optic systems. My strongest recent project is Rust, but) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 375.0 Td (the engineering concepts transfer: typed interfaces, boundary validation, deterministic tests,) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 361.0 Td (explicit error handling, logging, and modular dependencies. I am prepared to learn the team's) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 347.0 Td (specific coding standards, toolchain, protocol details, and verification process.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 14 Tf 54.0 322.0 Td (STAR Story) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 11 Tf 54.0 299.0 Td (Situation) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 282.0 Td (I wanted to build more than a script that generated stock signals. I wanted to understand how a) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 268.0 Td (complete system should behave when data is incomplete, a trade violates limits, or execution) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 254.0 Td (needs to be simulated.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 11 Tf 54.0 237.0 Td (Task) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 220.0 Td (I designed a system that could analyze market data, make a strategy decision, enforce risk) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 206.0 Td (controls, and execute only through a controlled paper-trading path.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 11 Tf 54.0 189.0 Td (Action) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 172.0 Td (I separated provider, analysis, strategy, portfolio, broker, and backtesting responsibilities. I) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 158.0 Td (added mock data so tests would be deterministic, implemented configurable risk checks, and wrote) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 144.0 Td (tests for indicators, strategy decisions, risk rejection, backtesting, and paper-order) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 130.0 Td (execution.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 11 Tf 54.0 113.0 Td (Result) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 96.0 Td (The result is a system where I can test the decision process without relying on live markets or) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 82.0 Td (risking real funds. More importantly, I learned to treat external interfaces and safety) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 68.0 Td (boundaries as explicit parts of the design. That is the same mindset I would bring to automated) Tj
+1 0 0 1 -54.0 0 Tm
+ET
+endstream
+endobj
+6 0 obj
+<< /Length 3654 >>
+stream
+BT
+/F1 10 Tf 54.0 738.0 Td (test-station software.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 14 Tf 54.0 713.0 Td (Likely Follow-Up Answers) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 10 Tf 54.0 690.0 Td (What was the hardest part?) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 675.0 Td (The hardest part was keeping the system modular while coordinating data, analysis, strategy,) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 661.0 Td (risk, and execution. It would have been easy to put everything in one function, but that would) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 647.0 Td (make testing and future changes difficult. I had to define clear boundaries and decide what each) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 633.0 Td (layer was responsible for.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 10 Tf 54.0 616.0 Td (What would you improve?) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 601.0 Td (I would improve persistence and execution realism first. I would add repository functions and) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 587.0 Td (durable records in PostgreSQL, structured logs, and broader integration tests. I would also) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 573.0 Td (improve the backtester by modeling transaction costs, open positions at the end of a run, and) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 559.0 Td (more realistic fills.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 10 Tf 54.0 542.0 Td (How do you approach reliability?) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 527.0 Td (I identify failure modes and define expected behavior for each one. Then I isolate dependencies,) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 513.0 Td (validate inputs at boundaries, use deterministic tests, log enough information to reproduce) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 499.0 Td (failures, and test both successful and rejected cases. For aerospace work, I would follow the) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 485.0 Td (team's requirements, review, configuration-management, and verification processes.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 14 Tf 54.0 460.0 Td (Closing Statement) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 9 Tf 54.0 437.0 Td (ANSWER) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 423.0 Td (This project gave me practice building a complete software system rather than only implementing) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 409.0 Td (an isolated algorithm. I learned how to separate interfaces, control risk, simulate external) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 395.0 Td (dependencies, test behavior, and make decisions observable. I know aerospace software has) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 381.0 Td (stricter requirements and processes, and that is exactly what interests me. I would bring those) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 367.0 Td (fundamentals, my willingness to learn C++ and the team's avionics interfaces, and a careful) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 353.0 Td (approach to verification and reliability.) Tj
+1 0 0 1 -54.0 0 Tm
+/F2 14 Tf 54.0 328.0 Td (Project References) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 305.0 Td (- README.md: project overview and setup.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 288.0 Td (- src/database.rs: SQLx PostgreSQL connection pool.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 271.0 Td (- migrations/001_initial_schema.sql: relational PostgreSQL schema.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 254.0 Td (- src/config.rs: environment-based database configuration.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 237.0 Td (- src/trading/engine.rs: analysis, strategy, risk, and order coordination.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 220.0 Td (- src/strategy/risk.rs: position sizing and trade validation.) Tj
+1 0 0 1 -54.0 0 Tm
+/F1 10 Tf 54.0 203.0 Td (- tests/: automated tests for core behavior.) Tj
+1 0 0 1 -54.0 0 Tm
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 11 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 3 0 R >>
+endobj
+8 0 obj
+<< /Type /Page /Parent 11 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 4 0 R >>
+endobj
+9 0 obj
+<< /Type /Page /Parent 11 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 5 0 R >>
+endobj
+10 0 obj
+<< /Type /Page /Parent 11 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R /F2 2 0 R >> >> /Contents 6 0 R >>
+endobj
+11 0 obj
+<< /Type /Pages /Kids [7 0 R 8 0 R 9 0 R 10 0 R] /Count 4 >>
+endobj
+12 0 obj
+<< /Type /Catalog /Pages 11 0 R >>
+endobj
+xref
+0 13
+0000000000 65535 f 
+0000000015 00000 n 
+0000000085 00000 n 
+0000000160 00000 n 
+0000004996 00000 n 
+0000010239 00000 n 
+0000015033 00000 n 
+0000018739 00000 n 
+0000018876 00000 n 
+0000019013 00000 n 
+0000019150 00000 n 
+0000019288 00000 n 
+0000019365 00000 n 
+trailer
+<< /Size 13 /Root 12 0 R >>
+startxref
+19416
+%%EOF
